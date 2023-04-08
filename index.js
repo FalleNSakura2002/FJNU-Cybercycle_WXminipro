@@ -59,6 +59,4 @@ async function bootstrap() {
   });
 }
 
-ceshi;
-
 bootstrap();
