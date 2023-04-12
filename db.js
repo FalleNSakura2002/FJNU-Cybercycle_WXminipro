@@ -25,6 +25,7 @@ const sequelize = new Sequelize("cybercycle", "root", "FALLcanyue2001", {
   host,
   port,
   dialect: "mysql",
+  query: { raw: true },
 });
 // 定义用户信息
 const user_info = sequelize.define("user_info", {
@@ -77,12 +78,6 @@ const user_info = sequelize.define("user_info", {
     allowNull: false,
     defaultValue: "",
   },
-  // 记录用户的教学班id
-  user_class_id: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: "",
-  },
   // 记录用户的信用分
   user_credit: {
     type: DataTypes.FLOAT(4, 1),
@@ -122,25 +117,32 @@ const cycle_info = sequelize.define("cycle_info", {
 
 // 记录课表
 const course_scheme = sequelize.define("course_scheme", {
+  // 教学班名称
+  course_class: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    defaultValue: "",
+    primaryKey: true,
+  },
   // 上课时间
   course_time: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(50),
     allowNull: false,
-    default: "未开课",
+    defaultValue: "未开课",
     primaryKey: true,
   },
   // 课程名称
   course_name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(50),
     allowNull: false,
-    default: "课程无名称",
+    defaultValue: "课程无名称",
     primaryKey: true,
   },
   // 课程地点
   course_loc: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(50),
     allowNull: false,
-    default: "教学地点未安排",
+    defaultValue: "教学地点未安排",
     primaryKey: true,
   },
 });
