@@ -89,5 +89,26 @@ router.get("/violate", async (req, res) => {
   res.send(violate_events);
 });
 
+// 查询用户课表
+router.get("/scheme", async (req, res) => {
+  var wxid = req.headers["x-wx-openid"];
+  // 根据openid,请求教学班名称
+  const userinfo = await user_info.findOne({
+    attributes: ["user_class_name"],
+    where: {
+      user_wxid: wxid,
+    },
+  });
+  var userClassname = userinfo.user_class_name;
+  // 根据教学班名称查询课表
+  const scheme = await course_scheme.findAll({
+    attributes: { exclude: ["createdAt", "updatedAt", "course_class"] },
+    where: {
+      course_class: userClassname,
+    },
+  });
+  res.send(scheme);
+});
+
 //
 module.exports = router;

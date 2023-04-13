@@ -197,6 +197,16 @@ const violate = sequelize.define("violate", {
     allowNull: false,
     defaultValue: "",
   },
+  // 违章事件评判状态
+  violate_res: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  // 违章事件评判人员给出的评判
+  violate_judge: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 // 记录违章影像

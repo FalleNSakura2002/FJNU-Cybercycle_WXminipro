@@ -78,7 +78,7 @@ app.post("/write_cycle", async (req, res) => {
   res.send("userdata");
 });
 
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 8080;
 
 async function bootstrap() {
   await initDB();

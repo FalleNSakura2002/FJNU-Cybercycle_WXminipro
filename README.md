@@ -141,6 +141,89 @@
 ]
 ```
 
+### `GET /userinfo/scheme`
+
+请求用户的课程信息
+
+#### 请求参数
+
+微信 openID
+
+#### 响应结果
+
+- `course_time`: 课程时间
+- `course_name`: 课程名称
+- `course_loc`: 上课地点
+
+#### 响应结果示例
+
+```json
+[
+  {
+    "course_time": "星期一第1-2节",
+    "course_name": "生理心理学",
+    "course_loc": "知明1-204"
+  },
+  {
+    "course_time": "星期三第1-2节",
+    "course_name": "军事理论",
+    "course_loc": "知明2-202"
+  },
+  {
+    "course_time": "星期三第3-4节",
+    "course_name": "普通心理学Ⅱ",
+    "course_loc": "立诚1-101"
+  }
+]
+```
+
+## 违章事件 API 接口
+
+### `GET /violate/RandomEvent`
+
+随机请求一个未处理完成的违章事件
+
+#### 请求参数
+
+无
+
+#### 响应结果
+
+- `violate_id`: 违章事件 ID
+- `violate_lic_num`: 违章车牌号
+- `violate_loc`: 违章地点
+
+#### 响应结果示例
+
+```json
+{
+  "violate_id": "2",
+  "violate_lic_num": "B4755",
+  "violate_loc": "桃李园"
+}
+```
+
+### `POST /violate/EventUpdate`
+
+更新违章事件评判结果
+
+#### 请求参数
+
+- `eventID`: 违章事件 ID
+- `EventJug`: 违章事件评判结果
+
+#### 响应结果
+
+无有意义结果
+
+#### 响应结果示例
+
+```json
+{
+  "result": "事件已更新！"
+}
+```
+
 ## License
 
 [MIT](./LICENSE)
