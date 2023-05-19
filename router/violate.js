@@ -4,7 +4,6 @@ const router = express.Router();
 
 // 导入数据库
 const {
-  init: initDB,
   user_info,
   cycle_info,
   course_scheme,
@@ -86,6 +85,8 @@ router.post("/EventUpdate", async (req, res) => {
   }
   res.send({ result: "事件已更新！" });
 });
+
+//
 
 //
 module.exports = router;

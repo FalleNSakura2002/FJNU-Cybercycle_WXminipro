@@ -30,7 +30,7 @@
 - `store_register_ok.ejs`：注册成功渲染模板
 - `store_main.ejs`：后台管理页面渲染模板
 - `package.json`：Node.js 项目定义文件
-- `container.config.json`：模板部署「服务设置」初始化配置（二开请忽略）
+- `container.config.json`：模板部署「服务设置」初始化配置
 - `Dockerfile`：容器配置文件
 
 ## 用户信息 API 接口
@@ -220,6 +220,36 @@
 ```json
 {
   "result": "事件已更新！"
+}
+```
+
+## 道路信息 API 接口
+
+### `GET /road/TrafficFlow`
+
+请求指定时段和地点的预计交通流
+
+#### 请求参数
+
+- `dormitory`: 出发位置，如`"李苑"、"李苑1"、"李苑1_110"`
+- `target`: 到达位置，如`"知明"、"知明1"、"知明1-110"`
+- `time`: 指定查询时间，如`"星期一"、"星期一第1-2节"`
+
+#### 响应结果
+
+- `dormitory`: 出发位置
+- `target`: 到达位置
+- `time`: 指定查询时间
+- `quantity`: 流量
+
+#### 响应结果实例
+
+```json
+{
+  "dormitory": "李苑",
+  "target": "致广",
+  "time": "星期一第1-2节",
+  "quantity": 48
 }
 ```
 

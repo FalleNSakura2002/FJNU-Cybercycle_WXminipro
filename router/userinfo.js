@@ -4,7 +4,6 @@ const router = express.Router();
 
 // 导入数据库
 const {
-  init: initDB,
   user_info,
   cycle_info,
   course_scheme,
