@@ -35,9 +35,7 @@
 
 ## 用户信息 API 接口
 
-### `GET /userinfo`
-
-请求用户信息
+### 请求用户信息 `GET /userinfo`
 
 #### 请求参数
 
@@ -70,9 +68,7 @@
 }
 ```
 
-### `GET /userinfo/license`
-
-请求用户拥有的所有车辆信息
+### 请求用户拥有的所有车辆信息 `GET /userinfo/license`
 
 #### 请求参数
 
@@ -104,9 +100,7 @@
 ]
 ```
 
-### `GET /userinfo/violate`
-
-请求用户所有的违章信息
+### 请求用户所有的违章信息 `GET /userinfo/violate`
 
 #### 请求参数
 
@@ -140,9 +134,7 @@
 ]
 ```
 
-### `GET /userinfo/scheme`
-
-请求用户的课程信息
+### 请求用户的课程信息 `GET /userinfo/scheme`
 
 #### 请求参数
 
@@ -178,9 +170,51 @@
 
 ## 违章事件 API 接口
 
-### `GET /violate/RandomEvent`
+### 请求指定数量的最近违章事件 `GET /RecentEvents`
 
-随机请求一个未处理完成的违章事件
+#### 请求参数
+
+- `Event_number`: 请求事件的数量
+
+#### 响应结果
+
+- `violate_id`: 违章事件 ID、
+- `violate_lic_num`: 违章车牌号
+- `violate_loc`: 违章地点
+- `createdAt`: 举报时间
+- `user_id`: 被举报人 ID
+- `user_name`: 被举报人名称
+- `user_academy`: 被举报人所属学院
+- `user_class_name`: 被举报人所属教学班
+
+#### 响应结果示例
+
+```json
+[
+  {
+    "violate_id": "4",
+    "violate_lic_num": "D2011",
+    "violate_loc": "知明楼",
+    "createdAt": "2023-04-10T21:49:45.000Z",
+    "user_id": "116092021174",
+    "user_name": "徐建",
+    "user_academy": "地理科学学院",
+    "user_class_name": "2022级地理科学(师范)2班"
+  },
+  {
+    "violate_id": "3",
+    "violate_lic_num": "C2312",
+    "violate_loc": "桃李园",
+    "createdAt": "2023-04-10T21:49:08.000Z",
+    "user_id": "100002019011",
+    "user_name": "柴文",
+    "user_academy": "心理学院",
+    "user_class_name": "2022级心理学类1班"
+  }
+]
+```
+
+### 随机请求一个未处理完成的违章事件 `GET /violate/RandomPendingEvent`
 
 #### 请求参数
 
@@ -202,9 +236,7 @@
 }
 ```
 
-### `POST /violate/EventUpdate`
-
-更新违章事件评判结果
+### 更新违章事件评判结果 `POST /violate/EventUpdate`
 
 #### 请求参数
 
@@ -225,9 +257,7 @@
 
 ## 道路信息 API 接口
 
-### `GET /road/TrafficFlow`
-
-请求指定时段和地点的预计交通流
+### 请求指定时段和地点的预计交通流 `GET /road/TrafficFlow`
 
 #### 请求参数
 
@@ -242,7 +272,7 @@
 - `time`: 指定查询时间
 - `quantity`: 流量
 
-#### 响应结果实例
+#### 响应结果示例
 
 ```json
 {
@@ -250,6 +280,28 @@
   "target": "致广",
   "time": "星期一第1-2节",
   "quantity": 48
+}
+```
+
+### 请求当前某道路的交通状况 `GET /road/Traffic`
+
+#### 请求参数
+
+- `road_id`: 道路指定 ID
+
+#### 响应结果
+
+- `road_id`: 道路指定 ID
+- `road_name`: 道路名称
+- `traffic`: 道路流量
+
+#### 响应结果示例
+
+```json
+{
+  "id": "1",
+  "road_name": "桃李路",
+  "traffic": "32"
 }
 ```
 

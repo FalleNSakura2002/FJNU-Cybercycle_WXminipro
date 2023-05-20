@@ -226,6 +226,9 @@ const violate_img = sequelize.define("violate_img", {
   },
 });
 
+// 记录道路数据
+const road = sequelize.define("road");
+
 // 数据库初始化方法
 async function init() {
   await user_info.sync({ alter: true });
@@ -245,4 +248,5 @@ module.exports = {
   monitor_video,
   violate,
   violate_img,
+  road,
 };

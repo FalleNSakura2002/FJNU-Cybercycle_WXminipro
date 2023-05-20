@@ -13,8 +13,8 @@ const {
 } = require("../db");
 const { Op } = require("sequelize");
 
-// 随机抽取任一未处理完的事件
-router.get("/RandomEvent", async (req, res) => {
+// 随机抽取一件未处理完的事件
+router.get("/RandomPendingEvent", async (req, res) => {
   // 获取所有待处理事件
   const PendingEvents = await violate.findAll({
     attributes: ["violate_id", "violate_lic_num", "violate_loc"],
@@ -25,6 +25,53 @@ router.get("/RandomEvent", async (req, res) => {
   // 抽取随机事件
   var randID = Math.floor(Math.random() * PendingEvents.length);
   res.send(PendingEvents[randID]);
+});
+
+// 抽取指定数量的最近违章事件
+router.get("/RecentEvents", async (req, res) => {
+  // 需要求取的事件数量
+  var Event_number = req.query.Event_number;
+  // 获取所有违章事件
+  const Events = await violate.findAll({
+    attributes: ["violate_id", "violate_lic_num", "violate_loc", "createdAt"],
+    order: [["createdAt", "DESC"]],
+  });
+  // 对比违章事件数量与需要求取的数量
+  RandEvents = [];
+  if (Events.length < Event_number) {
+    // 当违章事件数量少于请求量，全部输出
+    RandEvents = Events;
+  } else {
+    // 当违章事件数量多于请求量，抽取输出
+    // 抽取事件
+    for (i = 0; i < Event_number; i++) {
+      RandEvents.push(Events[i]);
+    }
+  }
+  // 重组信息
+  for (i = 0; i < RandEvents.length; i++) {
+    // 对应违章车牌查询学号
+    var cycle_user = await cycle_info.findOne({
+      attributes: ["cycle_user_id"],
+      where: {
+        cycle_lic_num: RandEvents[i].violate_lic_num,
+      },
+    });
+    var cycle_user_id = cycle_user.cycle_user_id;
+    // 对应学号查询信息
+    var cycle_user_info = await user_info.findOne({
+      attributes: ["user_name", "user_academy", "user_class_name"],
+      where: {
+        user_id: cycle_user_id,
+      },
+    });
+    // 补全回报报文
+    RandEvents[i].user_id = cycle_user_id;
+    RandEvents[i].user_name = cycle_user_info.user_name;
+    RandEvents[i].user_academy = cycle_user_info.user_academy;
+    RandEvents[i].user_class_name = cycle_user_info.user_class_name;
+  }
+  res.send(RandEvents);
 });
 
 // 更新违章信息 //还没测试

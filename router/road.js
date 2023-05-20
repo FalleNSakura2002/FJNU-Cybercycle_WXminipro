@@ -10,8 +10,9 @@ const {
   monitor_video,
   violate,
   violate_img,
+  road,
 } = require("../db");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 // 根据课表与教学班查询交通流
 router.get("/TrafficFlow", async (req, res) => {
@@ -53,6 +54,20 @@ router.get("/TrafficFlow", async (req, res) => {
     time: req.query.time,
     quantity: stu_quantity.length,
   });
+});
+
+// 查询道路负载
+router.get("/Traffic", async (req, res) => {
+  // 获取查询目标路段
+  var road_id = req.query.road_id;
+  // 查询对应路段路况
+  const road_traffic = await road.findOne({
+    attributes: ["id", "road_name", "traffic"],
+    where: {
+      id: road_id,
+    },
+  });
+  res.send(road_traffic);
 });
 
 //
