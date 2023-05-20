@@ -255,6 +255,41 @@
 }
 ```
 
+### 获取所有学院的违章次数 `GET /violate/NumOfAcademyEvents`
+
+#### 请求参数
+
+无
+
+#### 响应结果
+
+- `academy_name`: 学院名称
+- `academy_event_num`: 学院违章次数
+
+#### 响应示例
+
+```json
+[
+    {
+        "academy_name": "心理学院",
+        "academy_event_num": 2
+    },
+    {
+        "academy_name": "经济学院",
+        "academy_event_num": 3
+    },
+
+    .
+    .
+    .
+
+    {
+        "academy_name": "海外教育学院",
+        "academy_event_num": 5
+    }
+]
+```
+
 ## 道路信息 API 接口
 
 ### 请求指定时段和地点的预计交通流 `GET /road/TrafficFlow`

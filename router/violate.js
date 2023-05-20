@@ -34,6 +34,9 @@ router.get("/RecentEvents", async (req, res) => {
   // 获取所有违章事件
   const Events = await violate.findAll({
     attributes: ["violate_id", "violate_lic_num", "violate_loc", "createdAt"],
+    where: {
+      violate_res: "Y",
+    },
     order: [["createdAt", "DESC"]],
   });
   // 对比违章事件数量与需要求取的数量
@@ -74,7 +77,100 @@ router.get("/RecentEvents", async (req, res) => {
   res.send(RandEvents);
 });
 
-// 更新违章信息 //还没测试
+// 请求所有学院的违章次数信息
+router.get("/NumOfAcademyEvents", async (req, res) => {
+  academys = [
+    "心理学院",
+    "经济学院",
+    "法学院",
+    "马克思主义学院",
+    "传播学院",
+    "社会历史学院",
+    "文化旅游与公共管理学院",
+    "体育科学学院",
+    "音乐学院",
+    "美术学院",
+    "数学与统计学院",
+    "计算机与网络空间安全学院",
+    "物理与能源学院",
+    "光电与信息工程学院",
+    "化学与材料学院",
+    "环境与资源学院",
+    "地理科学学院",
+    "生命科学学院",
+    "海外教育学院",
+  ];
+  // 获取所有违章事件车牌
+  var AcademyEvents = await violate.findAll({
+    attributes: ["violate_lic_num"],
+    where: {
+      violate_res: "Y",
+    },
+  });
+  // 记录所有违章信息
+  violate_infos = [];
+  // 组成数组
+  all_lic = [];
+  for (i = 0; i < AcademyEvents.length; i++) {
+    all_lic.push(AcademyEvents[i].violate_lic_num);
+    violate_infos.push({ violate_lic: AcademyEvents[i].violate_lic_num });
+  }
+  // 查询所有违章者学号
+  var Violate_user_id = await cycle_info.findAll({
+    attributes: ["cycle_user_id", "cycle_lic_num"],
+    where: {
+      cycle_lic_num: all_lic,
+    },
+  });
+  // 组成数组并补充所有违章信息
+  all_id = [];
+  for (i = 0; i < Violate_user_id.length; i++) {
+    all_id.push(Violate_user_id[i].cycle_user_id);
+    for (j in violate_infos) {
+      if (violate_infos[j].violate_lic == Violate_user_id[i].cycle_lic_num) {
+        violate_infos[j].violate_user_id = Violate_user_id[i].cycle_user_id;
+      }
+    }
+  }
+  // 查询所有违章者所属学院信息
+  var Violate_academys = await user_info.findAll({
+    attributes: ["user_academy", "user_id"],
+    where: {
+      user_id: all_id,
+    },
+  });
+  // 补充所有违章信息
+  for (i in Violate_academys) {
+    for (j in violate_infos) {
+      if (Violate_academys[i].user_id == violate_infos[j].violate_user_id) {
+        violate_infos[j].violate_user_academy =
+          Violate_academys[i].user_academy;
+      }
+    }
+  }
+  // 统计各学院违章次数
+  academy_counts = [];
+  for (let i in academys) {
+    var academy_count = 0;
+    for (let j in violate_infos) {
+      if (violate_infos[j].violate_user_academy == academys[i]) {
+        academy_count += 1;
+      }
+    }
+    academy_counts.push(academy_count);
+  }
+  // 编辑返回报文
+  academy_res = [];
+  for (i = 0; i < academys.length; i++) {
+    academy_res.push({
+      academy_name: academys[i],
+      academy_event_num: academy_counts[i],
+    });
+  }
+  res.send(academy_res);
+});
+
+// 更新违章信息
 router.post("/EventUpdate", async (req, res) => {
   // 获取事件ID
   var EventID = req.body.eventID;
