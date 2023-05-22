@@ -170,7 +170,28 @@
 
 ## 违章事件 API 接口
 
-### 请求指定数量的最近违章事件 `GET /RecentEvents`
+### 上传举报事件 `POST /violate/Report`
+
+#### 请求参数
+
+- `x-wx-openid`: 微信 openID
+- `violate_lic`: 违章车辆车牌号
+- `violate_loc`: 违章事件位置
+- `photo`: 违章事件影像
+
+#### 响应结果
+
+- `result`: 事件状态
+
+#### 响应结果示例
+
+```json
+{
+  "result": "上传成功"
+}
+```
+
+### 请求指定数量的最近违章事件 `GET /violate/RecentEvents`
 
 #### 请求参数
 

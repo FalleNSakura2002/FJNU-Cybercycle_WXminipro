@@ -1,6 +1,20 @@
 // 建立路由
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+
+// 初始化存储器
+const storage = multer.diskStorage({
+  //保存路径
+  destination: function (req, file, cb) {
+    cb(null, "./tmp/my-uploads");
+  },
+  //保存在 destination 中的文件名
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + ".png");
+  },
+});
+const upload = multer({ storage: storage });
 
 // 导入数据库
 const {
@@ -12,6 +26,33 @@ const {
   violate_img,
 } = require("../db");
 const { Op } = require("sequelize");
+
+// 上传违章事件与图片
+router.post("/Report", upload.single("photo", 12), async (req, res) => {
+  // 随机组成事件编号
+  var randID = Math.floor(Math.random() * 100);
+  // 获取事件信息
+  var wxid = req.headers["x-wx-openid"];
+  var violate_id = String(Date.now()) + String(randID);
+  var violate_lic = req.body.violate_lic;
+  var violate_loc = req.body.violate_loc;
+  var violate_img_name = req.file.filename;
+  // 将事件写入数据库
+  await violate.create({
+    violate_id: violate_id,
+    violate_lic_num: violate_lic,
+    violate_loc: violate_loc,
+    violate_reporter_wxid: wxid,
+    violate_res: "",
+    violate_judge: "",
+  });
+  await violate_img.create({
+    violate_id: violate_id,
+    violate_img_dir: "/tmp/my-uploads/" + violate_img_name,
+  });
+  // 返回报文
+  res.send({ result: "上传成功" });
+});
 
 // 随机抽取一件未处理完的事件
 router.get("/RandomPendingEvent", async (req, res) => {
