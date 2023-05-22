@@ -39,7 +39,7 @@
 
 #### 请求参数
 
-微信 openID
+- `x-wx-openid`: 微信 openID
 
 #### 响应结果
 
@@ -72,7 +72,7 @@
 
 #### 请求参数
 
-微信 openID
+- `x-wx-openid`: 微信 openID
 
 #### 响应结果
 
@@ -104,7 +104,7 @@
 
 #### 请求参数
 
-微信 openID
+- `x-wx-openid`: 微信 openID
 
 #### 响应结果
 
@@ -138,7 +138,7 @@
 
 #### 请求参数
 
-微信 openID
+- `x-wx-openid`: 微信 openID
 
 #### 响应结果
 
