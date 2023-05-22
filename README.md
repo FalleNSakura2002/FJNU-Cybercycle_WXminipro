@@ -279,9 +279,7 @@
         "academy_event_num": 3
     },
 
-    .
-    .
-    .
+    ...
 
     {
         "academy_name": "海外教育学院",
