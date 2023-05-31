@@ -74,7 +74,10 @@ router.get("/RecentEvents", async (req, res) => {
   var Event_number = req.query.Event_number;
   // 获取所有违章事件
   const Events = await violate.findAll({
-    attributes: ["violate_id", "violate_lic_num", "violate_loc", "createdAt"],
+    attributes: ["violate_id", 
+                 "violate_lic_num", 
+                 "violate_loc", 
+                 "createdAt"],
     where: {
       violate_res: "Y",
     },
@@ -104,7 +107,9 @@ router.get("/RecentEvents", async (req, res) => {
     var cycle_user_id = cycle_user.cycle_user_id;
     // 对应学号查询信息
     var cycle_user_info = await user_info.findOne({
-      attributes: ["user_name", "user_academy", "user_class_name"],
+      attributes: ["user_name", 
+                   "user_academy", 
+                   "user_class_name"],
       where: {
         user_id: cycle_user_id,
       },

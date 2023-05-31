@@ -1,32 +1,33 @@
 const monitor = require("nodemon/lib/monitor");
 const { Sequelize, DataTypes } = require("sequelize");
 // 云端调试时需要用的配置
-// // 从环境变量中读取数据库配置
-// const { MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_ADDRESS = "" } = process.env;
-
-// const [host, port] = MYSQL_ADDRESS.split(":");
-
-// const sequelize = new Sequelize("nodejs_demo", MYSQL_USERNAME, MYSQL_PASSWORD, {
-//   host,
-//   port,
-//   dialect: "mysql",
-// });
-// 这一部分需要在上传云端的时候改回去
 // 从环境变量中读取数据库配置
-const {
-  MYSQL_USERNAME,
-  MYSQL_PASSWORD,
-  MYSQL_ADDRESS = "localhost:3306",
-} = process.env;
+const { MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_ADDRESS = "" } = process.env;
 
 const [host, port] = MYSQL_ADDRESS.split(":");
 
-const sequelize = new Sequelize("cybercycle", "root", "FALLcanyue2001", {
+const sequelize = new Sequelize("nodejs_demo", MYSQL_USERNAME, MYSQL_PASSWORD, {
   host,
   port,
   dialect: "mysql",
   query: { raw: true },
 });
+// 这一部分需要在上传云端的时候改回去
+// 从环境变量中读取数据库配置
+// const {
+//   MYSQL_USERNAME,
+//   MYSQL_PASSWORD,
+//   MYSQL_ADDRESS = "localhost:3306",
+// } = process.env;
+
+// const [host, port] = MYSQL_ADDRESS.split(":");
+
+// const sequelize = new Sequelize("cybercycle", "root", "FALLcanyue2001", {
+//   host,
+//   port,
+//   dialect: "mysql",
+//   query: { raw: true },
+// });
 // 定义用户信息
 const user_info = sequelize.define("user_info", {
   // 记录用户的wxid
