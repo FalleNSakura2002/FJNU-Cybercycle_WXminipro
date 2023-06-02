@@ -15,17 +15,43 @@ const { Op } = require("sequelize");
 
 // 用户信息相关
 
-// 请求用户名称
+// 根据学号请求用户信息
 router.get("/", async (req, res) => {
-  var wxid = req.headers["x-wx-openid"];
-  // 根据openid,请求信息
-  const userinfos = await user_info.findOne({
-    attributes: { exclude: ["createdAt", "updatedAt"] },
-    where: {
-      user_wxid: wxid,
-    },
-  });
-  res.send(userinfos);
+  // 初始化信息
+  var userinfo = "";
+  // 判断输入参数是什么，分别进行不同处理
+  if (req.query.user_id == null) {
+    var wxid = req.headers["x-wx-openid"];
+    userinfo = await user_info.findOne({
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      where: {
+        user_wxid: wxid,
+      },
+    });
+    var user_id = userinfo.user_id;
+  } else {
+    var user_id = req.query.user_id;
+    // 根据学号,请求信息
+    userinfo = await user_info.findOne({
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+      where: {
+        user_id: user_id,
+      },
+    });
+  }
+  if (userinfo.user_cycle_sit == 1) {
+    // 根据学号查询车辆信息
+    const cycleinfos = await cycle_info.findOne({
+      attributes: ["cycle_lic_num"],
+      where: {
+        cycle_user_id: user_id,
+      },
+    });
+    userinfo.user_lic_num = cycleinfos.cycle_lic_num;
+  } else {
+    userinfo.user_lic_num = "";
+  }
+  res.send(userinfo);
 });
 
 // 请求用户名下车辆信息

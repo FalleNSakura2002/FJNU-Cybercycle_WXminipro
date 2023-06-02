@@ -28,6 +28,7 @@ const sequelize = new Sequelize("Cybercycle", MYSQL_USERNAME, MYSQL_PASSWORD, {
 //   dialect: "mysql",
 //   query: { raw: true },
 // });
+
 // 定义用户信息
 const user_info = sequelize.define("user_info", {
   // 记录用户的wxid

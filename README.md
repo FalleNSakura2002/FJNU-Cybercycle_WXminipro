@@ -39,7 +39,10 @@
 
 #### 请求参数
 
+以下参数任选一，且`user_id`具有更高优先级
+
 - `x-wx-openid`: 微信 openID
+- `user_id`: 查询对象的学号
 
 #### 响应结果
 
@@ -51,6 +54,7 @@
 - `user_cycle_sit`: 用户拥车情况(`1`为拥有, `0`为不拥有)
 - `user_class_name`: 用户所属教学班
 - `user_credit`: 用户信用分
+- `user_lic_num`: 返回车牌号
 
 #### 响应结果示例
 
@@ -64,7 +68,8 @@
   "user_phone": "13379046420",
   "user_cycle_sit": 1,
   "user_class_name": "2022级心理学类1班",
-  "user_credit": 12
+  "user_credit": 12,
+  "user_lic_num": "B4755"
 }
 ```
 
@@ -280,10 +285,11 @@
 
 #### 请求参数
 
-无
+- `time`: 查询事件日期，如`2023-05-22`
 
 #### 响应结果
 
+- `violate_time`: 违章时间
 - `academy_name`: 学院名称
 - `academy_event_num`: 学院违章次数
 
@@ -292,10 +298,12 @@
 ```json
 [
     {
+        "violate_time": "2023-05-22",
         "academy_name": "心理学院",
         "academy_event_num": 2
     },
     {
+        "violate_time": "2023-05-22",
         "academy_name": "经济学院",
         "academy_event_num": 3
     },
@@ -303,8 +311,46 @@
     ...
 
     {
+        "violate_time": "2023-05-22",
         "academy_name": "海外教育学院",
         "academy_event_num": 5
+    }
+]
+```
+
+### 获取所有区域的违章次数 `GET /violate/NumOfLocEvents`
+
+#### 请求参数
+
+- `time`: 查询事件日期，如`2023-05-22`
+
+#### 响应结果
+
+- `violate_time`: 违章时间
+- `violate_loc`: 违章区域
+- `violate_event_num`: 违章统计次数
+
+#### 响应示例
+
+```json
+[
+    {
+        "violate_time": "2023-05-22",
+        "violate_loc": "花香园",
+        "violate_event_num": 1
+    },
+    {
+        "violate_time": "2023-05-22",
+        "violate_loc": "百草园",
+        "violate_event_num": 0
+    },
+
+    ...
+
+    {
+        "violate_time": "2023-05-22",
+        "violate_loc": "致广楼",
+        "violate_event_num": 0
     }
 ]
 ```

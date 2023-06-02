@@ -25,7 +25,7 @@ const {
   violate,
   violate_img,
 } = require("../db");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 // 上传违章事件与图片
 router.post("/Report", upload.single("photo", 12), async (req, res) => {
@@ -74,10 +74,7 @@ router.get("/RecentEvents", async (req, res) => {
   var Event_number = req.query.Event_number;
   // 获取所有违章事件
   const Events = await violate.findAll({
-    attributes: ["violate_id", 
-                 "violate_lic_num", 
-                 "violate_loc", 
-                 "createdAt"],
+    attributes: ["violate_id", "violate_lic_num", "violate_loc", "createdAt"],
     where: {
       violate_res: "Y",
     },
@@ -107,9 +104,7 @@ router.get("/RecentEvents", async (req, res) => {
     var cycle_user_id = cycle_user.cycle_user_id;
     // 对应学号查询信息
     var cycle_user_info = await user_info.findOne({
-      attributes: ["user_name", 
-                   "user_academy", 
-                   "user_class_name"],
+      attributes: ["user_name", "user_academy", "user_class_name"],
       where: {
         user_id: cycle_user_id,
       },
@@ -123,8 +118,62 @@ router.get("/RecentEvents", async (req, res) => {
   res.send(RandEvents);
 });
 
+// 请求某个位置的违章次数信息
+router.get("/NumOfLocEvents", async (req, res) => {
+  // 查询事件时间
+  var time_start = req.query.time + "T00:00:00.000Z";
+  var time_end = req.query.time + "T24:00:00.000Z";
+  var locs = [
+    "桃李园",
+    "文化街",
+    "花香园",
+    "百草园",
+    "随园",
+    "桃苑",
+    "李苑",
+    "桂苑",
+    "榕园",
+    "兰苑",
+    "知明楼",
+    "笃行楼",
+    "立诚楼",
+    "致广楼",
+    "其它",
+  ];
+  // 获取所有违章事件车牌
+  var AcademyEvents = await violate.findAll({
+    attributes: ["violate_loc"],
+    where: {
+      violate_res: "Y",
+      createdAt: {
+        [Op.between]: [time_start, time_end],
+      },
+    },
+  });
+  // 返回报文
+  loc_res = [];
+  for (let i = 0; i < locs.length; i++) {
+    // 统计个数
+    loc_violate_count = 0;
+    for (let j = 0; j < AcademyEvents.length; j++) {
+      if (locs[i] == AcademyEvents[j].violate_loc) {
+        loc_violate_count += 1;
+      }
+    }
+    loc_res.push({
+      violate_time: req.query.time,
+      violate_loc: locs[i],
+      violate_event_num: loc_violate_count,
+    });
+  }
+  res.send(loc_res);
+});
+
 // 请求所有学院的违章次数信息
 router.get("/NumOfAcademyEvents", async (req, res) => {
+  // 查询事件时间
+  var time_start = req.query.time + "T00:00:00.000Z";
+  var time_end = req.query.time + "T24:00:00.000Z";
   academys = [
     "心理学院",
     "经济学院",
@@ -148,69 +197,47 @@ router.get("/NumOfAcademyEvents", async (req, res) => {
   ];
   // 获取所有违章事件车牌
   var AcademyEvents = await violate.findAll({
-    attributes: ["violate_lic_num"],
+    attributes: ["violate_lic_num", "violate_id"],
     where: {
       violate_res: "Y",
+      createdAt: {
+        [Op.between]: [time_start, time_end],
+      },
     },
   });
-  // 记录所有违章信息
-  violate_infos = [];
-  // 组成数组
-  all_lic = [];
-  for (i = 0; i < AcademyEvents.length; i++) {
-    all_lic.push(AcademyEvents[i].violate_lic_num);
-    violate_infos.push({ violate_lic: AcademyEvents[i].violate_lic_num });
+  // 将车牌号转为对应的学院
+  var academy_list = [];
+  for (let i = 0; i < AcademyEvents.length; i++) {
+    // 查询对应的学号
+    user_id = await cycle_info.findOne({
+      attributes: ["cycle_user_id"],
+      where: {
+        cycle_lic_num: AcademyEvents[i].violate_lic_num,
+      },
+    });
+    // 根据学号查询学院
+    violate_academy = await user_info.findOne({
+      attributes: ["user_academy"],
+      where: {
+        user_id: user_id.cycle_user_id,
+      },
+    });
+    // 根据结果构成违章学院
+    academy_list.push(violate_academy.user_academy);
   }
-  // 查询所有违章者学号
-  var Violate_user_id = await cycle_info.findAll({
-    attributes: ["cycle_user_id", "cycle_lic_num"],
-    where: {
-      cycle_lic_num: all_lic,
-    },
-  });
-  // 组成数组并补充所有违章信息
-  all_id = [];
-  for (i = 0; i < Violate_user_id.length; i++) {
-    all_id.push(Violate_user_id[i].cycle_user_id);
-    for (j in violate_infos) {
-      if (violate_infos[j].violate_lic == Violate_user_id[i].cycle_lic_num) {
-        violate_infos[j].violate_user_id = Violate_user_id[i].cycle_user_id;
+  // 统计违章信息
+  var academy_res = []; // 返回报文
+  for (let i = 0; i < academys.length; i++) {
+    var violate_count = 0;
+    for (let j = 0; j < academy_list.length; j++) {
+      if (academys[i] == academy_list[j]) {
+        violate_count += 1;
       }
     }
-  }
-  // 查询所有违章者所属学院信息
-  var Violate_academys = await user_info.findAll({
-    attributes: ["user_academy", "user_id"],
-    where: {
-      user_id: all_id,
-    },
-  });
-  // 补充所有违章信息
-  for (i in Violate_academys) {
-    for (j in violate_infos) {
-      if (Violate_academys[i].user_id == violate_infos[j].violate_user_id) {
-        violate_infos[j].violate_user_academy =
-          Violate_academys[i].user_academy;
-      }
-    }
-  }
-  // 统计各学院违章次数
-  academy_counts = [];
-  for (let i in academys) {
-    var academy_count = 0;
-    for (let j in violate_infos) {
-      if (violate_infos[j].violate_user_academy == academys[i]) {
-        academy_count += 1;
-      }
-    }
-    academy_counts.push(academy_count);
-  }
-  // 编辑返回报文
-  academy_res = [];
-  for (i = 0; i < academys.length; i++) {
     academy_res.push({
+      violate_time: req.query.time,
       academy_name: academys[i],
-      academy_event_num: academy_counts[i],
+      academy_event_num: violate_count,
     });
   }
   res.send(academy_res);
@@ -275,7 +302,17 @@ router.post("/EventUpdate", async (req, res) => {
   res.send({ result: "事件已更新！" });
 });
 
-//
+//测试用接口
+router.get("/test", async (req, res) => {
+  const resu = await violate.findAll({
+    where: {
+      createdAt: {
+        [Op.between]: [time_start, time_end],
+      },
+    },
+  });
+  res.send(resu);
+});
 
 //
 module.exports = router;
