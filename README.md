@@ -47,6 +47,7 @@
 #### 响应结果
 
 - `user_wxid`: 用户微信 openID
+- `user_id`: 用户学号
 - `user_name`: 用户姓名
 - `user_academy`: 用户所属学院
 - `user_bedroom`: 用户宿舍
@@ -267,7 +268,7 @@
 #### 请求参数
 
 - `eventID`: 违章事件 ID
-- `EventJug`: 违章事件评判结果
+- `eventJug`: 违章事件评判结果
 
 #### 响应结果
 
@@ -402,6 +403,121 @@
   "id": "1",
   "road_name": "桃李路",
   "traffic": "32"
+}
+```
+
+## WEB 端管理 API 接口
+
+### 登入账户 `POST /web/login`
+
+该 API 会为浏览器添加一个 Cookie `Cybercycle`,同时更新数据库内的 Cookie
+
+#### 请求参数
+
+- `account`: 登录账号
+- `pswd`: 登录密码
+
+#### 响应结果
+
+- `status`: 分别为`账号不存在`,`密码错误`,`已登录`
+- `Cybercycle`: 一个可用于获取登录信息的`加密Cookie`
+
+#### 响应结果示例
+
+```json
+{
+  "status": "已登录"
+}
+```
+
+### 登出账户 `POST /web/logout`
+
+该 API 会清除浏览器的 Cookie `Cybercycle`,同时更新数据库内的 Cookie
+
+#### 请求参数
+
+- `Cybercycle`: 用于记录登录信息的`加密Cookie`
+
+#### 响应结果
+
+- `status`: `已退出`
+
+#### 响应结果示例
+
+```json
+{
+  "status": "已退出"
+}
+```
+
+### 获取账户信息 `POST /web/getinfo`
+
+#### 请求参数
+
+- `Cybercycle`: 用于记录登录信息的`加密Cookie`
+
+#### 响应结果
+
+- `user_name`: 用户名称
+- `user_identify`: 用户身份
+
+#### 响应结果示例
+
+```json
+{
+  "user_name": "张三",
+  "user_identify": "管理员"
+}
+```
+
+### 更新学生信息 `POST /web/stuinfo/update`
+
+该 API 会验证浏览器的 Cookie `Cybercycle`,验证管理员状态后，进行更新
+
+#### 请求参数
+
+- `Cybercycle`: 用于验证身份的`加密Cookie`
+- `stuid`: 学生学号
+- `stu_name`: 学生姓名
+- `stu_cycle_sit`: 学生拥车情况,`0`为不拥有，`1`为拥有
+- `stu_academy`: 学生学院
+- `stu_bedroom`: 学生宿舍
+- `stu_phone`: 学生手机号
+- `stu_class_name`: 学生教学班名称
+- `stu_credit`: 学生信誉分
+- `stu_wxid`: 学生微信 ID
+- \*`stu_cycle_id`: 学生车辆车牌(可选)
+
+#### 响应结果
+
+- `status`: 处理状态,分别为`身份错误`和`更新完成`
+
+#### 响应结果示例
+
+```json
+{
+  "status": "更新完成"
+}
+```
+
+## 小程序端管理 API 接口
+
+### 绑定微信账号与学号
+
+#### 请求参数
+
+- `x-wx-openid`: 微信 openID
+- `stu_id`: 绑定对象的学号
+
+#### 响应结果
+
+- `status`: 处理状态,`已绑定`
+
+#### 响应结果示例
+
+```json
+{
+  "status": "已绑定"
 }
 ```
 

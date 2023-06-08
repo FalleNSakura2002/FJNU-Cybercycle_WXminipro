@@ -228,6 +228,40 @@ const violate_img = sequelize.define("violate_img", {
   },
 });
 
+// 记录web端登录信息
+const webuser = sequelize.define("webuser", {
+  // 用户名称
+  user_name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "",
+  },
+  // 用户身份
+  user_identify: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "",
+  },
+  // 用户账号
+  user_account: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "",
+  },
+  // 用户密码
+  user_pswd: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "",
+  },
+  // 用户当前cookie
+  user_cookie: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "",
+  },
+});
+
 // 记录道路数据
 const road = sequelize.define("road");
 
@@ -239,6 +273,7 @@ async function init() {
   await monitor_video.sync({ alter: true });
   await violate.sync({ alter: true });
   await violate_img.sync({ alter: true });
+  await webuser.sync({ alter: true });
 }
 
 // 导出初始化方法和模型
@@ -251,4 +286,5 @@ module.exports = {
   violate,
   violate_img,
   road,
+  webuser,
 };

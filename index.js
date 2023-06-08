@@ -3,6 +3,7 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const bodyParser = require("body-parser"); //body参数解析
 const {
   init: initDB,
   user_info,
@@ -32,7 +33,7 @@ app.use(cors({ credentials: true, origin: true }));
 app.use(logger);
 app.set("view engine", "ejs");
 app.set("views", "./");
-app.use(cookieParser());
+app.use(cookieParser("Cybercycle"));
 
 // 引入router
 app.use("/", require("./router"));

@@ -26,5 +26,25 @@ router.get("/username", async (req, res) => {
   res.send(username);
 });
 
+// 绑定微信账号
+router.post("/UpdateBind", async (req, res) => {
+  var wxid = req.headers["x-wx-openid"];
+  var user_id = req.body.stu_id;
+  // 更新值
+  await user_info.update(
+    {
+      user_wxid: wxid,
+    },
+    {
+      where: {
+        user_id: user_id,
+      },
+    }
+  );
+  res.send({
+    status: "已绑定",
+  });
+});
+
 //
 module.exports = router;
