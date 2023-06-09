@@ -1,20 +1,22 @@
 // 建立路由
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
+// const multer = require("multer");
+const request = require("request");
+const fs = require("fs");
 
-// 初始化存储器
-const storage = multer.diskStorage({
-  //保存路径
-  destination: function (req, file, cb) {
-    cb(null, "./tmp/my-uploads");
-  },
-  //保存在 destination 中的文件名
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + ".png");
-  },
-});
-const upload = multer({ storage: storage });
+// // 初始化存储器
+// const storage = multer.diskStorage({
+//   //保存路径
+//   destination: function (req, file, cb) {
+//     cb(null, "./tmp/my-uploads");
+//   },
+//   //保存在 destination 中的文件名
+//   filename: function (req, file, cb) {
+//     cb(null, Date.now() + ".png");
+//   },
+// });
+// const upload = multer({ storage: storage });
 
 // 导入数据库
 const {
@@ -28,7 +30,7 @@ const {
 const { Op, where } = require("sequelize");
 
 // 上传违章事件与图片
-router.post("/Report", upload.single("photo", 12), async (req, res) => {
+router.post("/Report", async (req, res) => {
   // 随机组成事件编号
   var randID = Math.floor(Math.random() * 100);
   // 获取事件信息
@@ -36,7 +38,6 @@ router.post("/Report", upload.single("photo", 12), async (req, res) => {
   var violate_id = String(Date.now()) + String(randID);
   var violate_lic = req.body.violate_lic;
   var violate_loc = req.body.violate_loc;
-  var violate_img_name = req.file.filename;
   // 将事件写入数据库
   await violate.create({
     violate_id: violate_id,
@@ -46,10 +47,14 @@ router.post("/Report", upload.single("photo", 12), async (req, res) => {
     violate_res: "",
     violate_judge: "",
   });
+  // 将图片相关信息写入数据库
   await violate_img.create({
     violate_id: violate_id,
-    violate_img_dir: "/tmp/my-uploads/" + violate_img_name,
+    violate_img_dir: "/violate/" + violate_id + ".jpg",
   });
+  // 获取缓存地址并上传
+  const files = req.files.file.tempFilePath;
+  gettoken(violate_id, files);
   // 返回报文
   res.send({ result: "上传成功" });
 });
@@ -316,3 +321,53 @@ router.get("/test", async (req, res) => {
 
 //
 module.exports = router;
+
+// 一个请求token的方法
+async function gettoken(violate_id, violate_pic) {
+  const file_name = "violate/" + violate_id + ".jpg";
+  request(
+    {
+      url: "https://api.weixin.qq.com/tcb/uploadfile",
+      method: "POST",
+      json: true,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: {
+        env: "prod-1g5f3zj4b8b3d1db",
+        path: file_name,
+      },
+    },
+    function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        console.log(body);
+        postfile(body, file_name, violate_pic);
+      }
+    }
+  );
+}
+// 一个上传数据的方法
+async function postfile(token, file_name, violate_pic) {
+  const formData = {
+    key: file_name,
+    Signature: token.authorization,
+    "x-cos-security-token": token.token,
+    "x-cos-meta-fileid": token.cos_file_id,
+    file: fs.createReadStream(violate_pic),
+  };
+  request(
+    {
+      url: token.url,
+      method: "POST",
+      headers: { "Content-Type": "multipart/form-data" },
+      formData: formData,
+    },
+    function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        console.log(body);
+      } else {
+        console.log(body);
+      }
+    }
+  );
+}

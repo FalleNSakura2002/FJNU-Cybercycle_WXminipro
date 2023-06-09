@@ -24,6 +24,9 @@ const cookieParser = require("cookie-parser");
 // 引入fs
 const fs = require("fs");
 
+// 引入FUL
+const fileupload = require("express-fileupload");
+
 const logger = morgan("tiny");
 //建立服务器连接
 const app = express();
@@ -34,6 +37,7 @@ app.use(logger);
 app.set("view engine", "ejs");
 app.set("views", "./");
 app.use(cookieParser("Cybercycle"));
+app.use(fileupload({ useTempFiles: true, tempFileDir: "/tmp2/" }));
 
 // 引入router
 app.use("/", require("./router"));
