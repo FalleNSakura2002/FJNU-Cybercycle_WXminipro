@@ -183,7 +183,7 @@
 - `x-wx-openid`: 微信 openID
 - `violate_lic`: 违章车辆车牌号
 - `violate_loc`: 违章事件位置
-- `photo`: 违章事件影像
+- `file`: 违章事件影像
 
 #### 响应结果
 
