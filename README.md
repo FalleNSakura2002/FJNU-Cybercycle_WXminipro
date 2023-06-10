@@ -56,6 +56,7 @@
 - `user_class_name`: 用户所属教学班
 - `user_credit`: 用户信用分
 - `user_lic_num`: 返回车牌号
+- `status`: 用户信息,分为`用户存在`与`用户不存在`
 
 #### 响应结果示例
 
@@ -70,7 +71,8 @@
   "user_cycle_sit": 1,
   "user_class_name": "2022级心理学类1班",
   "user_credit": 12,
-  "user_lic_num": "B4755"
+  "user_lic_num": "B4755",
+  "status": "账号存在"
 }
 ```
 

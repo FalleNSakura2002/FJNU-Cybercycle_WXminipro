@@ -39,6 +39,13 @@ router.get("/", async (req, res) => {
       },
     });
   }
+  // 账号不存在直接返回
+  if (userinfo == null) {
+    res.send({
+      status: "账号不存在",
+    });
+    return;
+  }
   if (userinfo.user_cycle_sit == 1) {
     // 根据学号查询车辆信息
     const cycleinfos = await cycle_info.findOne({
@@ -51,6 +58,7 @@ router.get("/", async (req, res) => {
   } else {
     userinfo.user_lic_num = "";
   }
+  userinfo.status = "账号存在";
   res.send(userinfo);
 });
 
