@@ -57,6 +57,7 @@ router.post("/login", async (req, res) => {
     path: "/",
     signed: "true",
     sameSite: "none",
+    secure: "true",
   });
   res.send({
     status: "已登录",
