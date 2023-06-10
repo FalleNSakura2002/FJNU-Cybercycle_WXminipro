@@ -22,9 +22,10 @@ router.get("/", async (req, res) => {
   // 判断输入参数是什么，分别进行不同处理
   if (req.query.user_id == null) {
     var wxid = req.headers["x-wx-openid"];
+    // 如果没有输入任何参数,直接返回
     if (wxid == null) {
       res.send({
-        status: "账号不存在",
+        status: "未输入凭据",
       });
       return;
     }
@@ -34,7 +35,13 @@ router.get("/", async (req, res) => {
         user_wxid: wxid,
       },
     });
-    var user_id = userinfo.user_id;
+    // 账号不存在直接返回
+    if (userinfo == null) {
+      res.send({
+        status: "账号未绑定",
+      });
+      return;
+    }
   } else {
     var user_id = req.query.user_id;
     // 根据学号,请求信息
@@ -44,14 +51,15 @@ router.get("/", async (req, res) => {
         user_id: user_id,
       },
     });
+    // 账号不存在直接返回
+    if (userinfo == null) {
+      res.send({
+        status: "账号不存在",
+      });
+      return;
+    }
   }
-  // 账号不存在直接返回
-  if (userinfo == null) {
-    res.send({
-      status: "账号不存在",
-    });
-    return;
-  }
+  var user_id = userinfo.user_id;
   if (userinfo.user_cycle_sit == 1) {
     // 根据学号查询车辆信息
     const cycleinfos = await cycle_info.findOne({
