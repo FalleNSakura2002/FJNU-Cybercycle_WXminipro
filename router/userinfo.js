@@ -22,6 +22,12 @@ router.get("/", async (req, res) => {
   // 判断输入参数是什么，分别进行不同处理
   if (req.query.user_id == null) {
     var wxid = req.headers["x-wx-openid"];
+    if (wxid == null) {
+      res.send({
+        status: "账号不存在",
+      });
+      return;
+    }
     userinfo = await user_info.findOne({
       attributes: { exclude: ["createdAt", "updatedAt"] },
       where: {
