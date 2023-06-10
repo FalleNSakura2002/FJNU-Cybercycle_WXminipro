@@ -54,6 +54,7 @@ router.post("/login", async (req, res) => {
   );
   // 设置Cookie
   res.cookie("Cybercycle", randcookie, {
+    domain: "localhost",
     path: "/",
     signed: "true",
   });
