@@ -56,6 +56,7 @@ router.post("/login", async (req, res) => {
   res.cookie("Cybercycle", randcookie, {
     path: "/",
     signed: "true",
+    sameSite: "none",
   });
   res.send({
     status: "已登录",
