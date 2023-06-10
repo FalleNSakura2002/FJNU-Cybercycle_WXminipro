@@ -286,6 +286,29 @@ router.post("/EventUpdate", async (req, res) => {
         },
       }
     );
+    // 更新信誉分
+    // 查询车主ID
+    const violate_cyc_user = await violate_user(EventID);
+    // 查询信誉分数
+    const credit_info = await user_info.findOne({
+      attributes: ["user_credit"],
+      where: {
+        user_id: violate_cyc_user,
+      },
+    });
+    // 当还有信誉分时进行扣除
+    if (credit_info.user_credit != 0) {
+      await user_info.update(
+        {
+          user_credit: credit_info.user_credit - 2,
+        },
+        {
+          where: {
+            user_id: violate_cyc_user,
+          },
+        }
+      );
+    }
   } else if (N == 2) {
     await violate.update(
       { violate_res: "N", violate_judge: EventJug },
@@ -371,4 +394,22 @@ async function postfile(token, file_name, violate_pic) {
       }
     }
   );
+}
+
+// 根据违章事件查询用户的方法
+async function violate_user(violate_id) {
+  // 查询事件详细信息
+  const violate_event = await violate.findOne({
+    where: {
+      violate_id: violate_id,
+    },
+  });
+  // 根据违章车牌查询车主
+  const user_info = await cycle_info.findOne({
+    where: {
+      cycle_lic_num: violate_event.violate_lic_num,
+    },
+  });
+  // 返回学号信息
+  return user_info.cycle_user_id;
 }
