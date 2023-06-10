@@ -1,22 +1,8 @@
 // 建立路由
 const express = require("express");
 const router = express.Router();
-// const multer = require("multer");
 const request = require("request");
 const fs = require("fs");
-
-// // 初始化存储器
-// const storage = multer.diskStorage({
-//   //保存路径
-//   destination: function (req, file, cb) {
-//     cb(null, "./tmp/my-uploads");
-//   },
-//   //保存在 destination 中的文件名
-//   filename: function (req, file, cb) {
-//     cb(null, Date.now() + ".png");
-//   },
-// });
-// const upload = multer({ storage: storage });
 
 // 导入数据库
 const {
@@ -44,7 +30,7 @@ router.post("/Report", async (req, res) => {
     violate_id: violate_id,
     violate_lic_num: violate_lic,
     violate_loc: violate_loc,
-    violate_reporter_wxid: wxid,
+    violate_judger_wxid: "",
     violate_res: "",
     violate_judge: "",
   });
@@ -62,16 +48,31 @@ router.post("/Report", async (req, res) => {
 
 // 随机抽取一件未处理完的事件
 router.get("/RandomPendingEvent", async (req, res) => {
+  var wxid = req.headers["x-wx-openid"];
   // 获取所有待处理事件
   const PendingEvents = await violate.findAll({
-    attributes: ["violate_id", "violate_lic_num", "violate_loc"],
+    attributes: [
+      "violate_id",
+      "violate_lic_num",
+      "violate_loc",
+      "violate_judger_wxid",
+    ],
     where: {
       violate_res: "",
     },
   });
   // 抽取随机事件
-  var randID = Math.floor(Math.random() * PendingEvents.length);
-  res.send(PendingEvents[randID]);
+  for (let i = 0; i < 1; i--) {
+    var randID = Math.floor(Math.random() * PendingEvents.length);
+    // 检测是否有处理过该事件
+    console.log(PendingEvents[randID]);
+    var history = await judge_history(wxid, PendingEvents[randID]);
+    if (history == 0) {
+      // 如果没有处理过 就返回该事件
+      res.send(PendingEvents[randID]);
+      return;
+    }
+  }
 });
 
 // 抽取指定数量的最近违章事件
@@ -251,18 +252,21 @@ router.get("/NumOfAcademyEvents", async (req, res) => {
 
 // 更新违章信息
 router.post("/EventUpdate", async (req, res) => {
+  // 获取wxid
+  var wxid = req.headers["x-wx-openid"];
   // 获取事件ID
   var EventID = req.body.eventID;
   var EventJug = req.body.eventJug;
   // 根据事件ID获取原有事件情况
   const eventOld = await violate.findOne({
-    attributes: ["violate_id", "violate_judge"],
+    attributes: ["violate_id", "violate_judge", "violate_judger_wxid"],
     where: {
       violate_id: EventID,
     },
   });
   // 更新事件情况
   var EventJug = eventOld.violate_judge + String(EventJug) + "_";
+  var Event_Judger = eventOld.violate_judger_wxid + String(wxid) + "&&";
 
   // 检查是否需要更新事件评判结果
   EventSituation = EventJug.split("_");
@@ -279,7 +283,11 @@ router.post("/EventUpdate", async (req, res) => {
   //// 如果有两个Y或两个N，则更新评判结果
   if (Y == 2) {
     await violate.update(
-      { violate_res: "Y", violate_judge: EventJug },
+      {
+        violate_res: "Y",
+        violate_judge: EventJug,
+        violate_judger_wxid: Event_Judger,
+      },
       {
         where: {
           violate_id: EventID,
@@ -311,7 +319,11 @@ router.post("/EventUpdate", async (req, res) => {
     }
   } else if (N == 2) {
     await violate.update(
-      { violate_res: "N", violate_judge: EventJug },
+      {
+        violate_res: "N",
+        violate_judge: EventJug,
+        violate_judger_wxid: Event_Judger,
+      },
       {
         where: {
           violate_id: EventID,
@@ -320,7 +332,7 @@ router.post("/EventUpdate", async (req, res) => {
     );
   } else {
     await violate.update(
-      { violate_judge: EventJug },
+      { violate_judge: EventJug, violate_judger_wxid: Event_Judger },
       {
         where: {
           violate_id: EventID,
@@ -412,4 +424,18 @@ async function violate_user(violate_id) {
   });
   // 返回学号信息
   return user_info.cycle_user_id;
+}
+
+// 查询是否处理过该事件
+async function judge_history(wxid, event) {
+  // 获取评判人员wxid
+  var judger_ids = String(event.violate_judger_wxid).split("&&");
+  console.log(judger_ids);
+  // 检查是否评判过
+  for (let i = 0; i < judger_ids.length; i++) {
+    if (wxid == judger_ids[i]) {
+      return 1;
+    }
+  }
+  return 0;
 }

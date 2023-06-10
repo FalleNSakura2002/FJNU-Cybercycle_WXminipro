@@ -194,7 +194,7 @@ const violate = sequelize.define("violate", {
     defaultValue: "",
   },
   // 违章事件上传用户
-  violate_reporter_wxid: {
+  violate_judger_wxid: {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: "",

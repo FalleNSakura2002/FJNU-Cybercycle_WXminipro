@@ -182,7 +182,6 @@
 
 #### 请求参数
 
-- `x-wx-openid`: 微信 openID
 - `violate_lic`: 违章车辆车牌号
 - `violate_loc`: 违章事件位置
 - `file`: 违章事件影像
@@ -247,13 +246,14 @@
 
 #### 请求参数
 
-无
+- `user_wxid`: 用户微信 openID
 
 #### 响应结果
 
 - `violate_id`: 违章事件 ID
 - `violate_lic_num`: 违章车牌号
 - `violate_loc`: 违章地点
+- `violate_judger_wxid`: 评判过该事件的人员的 wxid,以`&&`分割
 
 #### 响应结果示例
 
@@ -261,7 +261,8 @@
 {
   "violate_id": "2",
   "violate_lic_num": "B4755",
-  "violate_loc": "桃李园"
+  "violate_loc": "桃李园",
+  "violate_judger_wxid": "wx_685&&"
 }
 ```
 
@@ -269,6 +270,7 @@
 
 #### 请求参数
 
+- `user_wxid`: 用户微信 openID
 - `eventID`: 违章事件 ID
 - `eventJug`: 违章事件评判结果
 
