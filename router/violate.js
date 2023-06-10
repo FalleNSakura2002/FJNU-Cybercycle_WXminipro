@@ -35,6 +35,7 @@ router.post("/Report", async (req, res) => {
   var randID = Math.floor(Math.random() * 100);
   // 获取事件信息
   var wxid = req.headers["x-wx-openid"];
+  console.log(wxid);
   var violate_id = String(Date.now()) + String(randID);
   var violate_lic = req.body.violate_lic;
   var violate_loc = req.body.violate_loc;
