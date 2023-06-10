@@ -24,6 +24,9 @@ const cookieParser = require("cookie-parser");
 // 引入fs
 const fs = require("fs");
 
+// 调整cookie作用域
+const session = require("express-session");
+
 // 引入FUL
 const fileupload = require("express-fileupload");
 
@@ -49,6 +52,16 @@ app.use(express.static(__dirname + "/"));
 app.get("/", async (req, res) => {
   res.redirect("/store_login.html");
 });
+
+// 允许Cookie跨域
+app.use(
+  session({
+    cookie: {
+      sameSite: "none",
+      secure: true,
+    },
+  })
+);
 
 // 小程序调用方法
 

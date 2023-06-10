@@ -30,6 +30,16 @@ router.get("/username", async (req, res) => {
 router.post("/UpdateBind", async (req, res) => {
   var wxid = req.headers["x-wx-openid"];
   var user_id = req.body.stu_id;
+  const presen = await user_info.findOne({
+    where: {
+      user_id: user_id,
+    },
+  });
+  if (presen == null) {
+    res.send({
+      status: "用户不存在",
+    });
+  }
   // 更新值
   await user_info.update(
     {
